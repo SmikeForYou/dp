@@ -168,3 +168,14 @@ func Compress[T any](data []T, compressor []bool) []T {
 	return res
 
 }
+
+//In will return index of first appearance of elem in data.
+//Returns -1 if elem does not appear
+func In[T comparable](elem T, data []T) int {
+	for i, t := range data {
+		if t == elem {
+			return i
+		}
+	}
+	return -1
+}

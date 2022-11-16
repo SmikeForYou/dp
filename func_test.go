@@ -147,3 +147,9 @@ func TestCompress(t *testing.T) {
 	res := Compress(data, compresor)
 	assert.Equal(t, []int{1, 2, 5}, res)
 }
+
+func TestIn(t *testing.T) {
+	data := []int{1, 2, 3, 4, 5, 6}
+	assert.Equal(t, 0, In(1, data))
+	assert.Equal(t, -1, In(10, data))
+}
