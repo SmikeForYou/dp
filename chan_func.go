@@ -1,17 +1,18 @@
 package dp
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"golang.org/x/exp/constraints"
 )
 
-//Chanalize converts array of values to channel with this values
-func Chanalize[T any](iterable ...T) <-chan T {
+// Chanalize converts array of values to channel with this values
+func Chanalize[T any](values ...T) <-chan T {
 	ch := make(chan T)
 	go func() {
-		for _, iter := range iterable {
+		for _, iter := range values {
 			ch <- iter
 		}
 		close(ch)
@@ -19,7 +20,20 @@ func Chanalize[T any](iterable ...T) <-chan T {
 	return ch
 }
 
-//ReleaseChanel read all values from chanel and returns array of this values
+// ChanalizeCb converts array of values to channel with this values and runs callback func afterall
+func ChanalizeCb[T any](callback func(), values ...T) <-chan T {
+	ch := make(chan T)
+	go func() {
+		for _, iter := range values {
+			ch <- iter
+		}
+		close(ch)
+		callback()
+	}()
+	return ch
+}
+
+// ReleaseChanel read all values from chanel and returns array of this values
 func ReleaseChanel[T any](chanel <-chan T) []T {
 	res := make([]T, 0)
 	for i := range chanel {
@@ -28,7 +42,7 @@ func ReleaseChanel[T any](chanel <-chan T) []T {
 	return res
 }
 
-//Cycle will cyclical returns values from iterable to channel one by one until chanel not closed
+// Cycle will cyclical returns values from iterable to channel one by one until chanel not closed
 func Cycle[T any](iterable ...T) (<-chan T, func()) {
 	res := make(chan T)
 	stop := make(chan byte, 5)
@@ -52,7 +66,7 @@ func Cycle[T any](iterable ...T) (<-chan T, func()) {
 	return res, closefunc
 }
 
-//FilterChan filters channel values using callback function
+// FilterChan filters channel values using callback function
 func FilterChan[T any](data <-chan T, callback func(elem T) bool) <-chan T {
 	res := make(chan T)
 	go func() {
@@ -66,7 +80,7 @@ func FilterChan[T any](data <-chan T, callback func(elem T) bool) <-chan T {
 	return res
 }
 
-//MapChan applies callback function to each value of chan and return to to new chanel
+// MapChan applies callback function to each value of chan and return to to new chanel
 func MapChan[T, K any](data <-chan T, callback func(elem T) K) <-chan K {
 	res := make(chan K)
 	go func() {
@@ -78,7 +92,7 @@ func MapChan[T, K any](data <-chan T, callback func(elem T) K) <-chan K {
 	return res
 }
 
-//ZipChan aggregates values from several chanels to portions and send them to result chanel
+// ZipChan aggregates values from several chanels to portions and send them to result chanel
 func ZipChan[T any](chanels ...<-chan T) <-chan []T {
 	res := make(chan []T)
 	go func() {
@@ -104,7 +118,7 @@ func ZipChan[T any](chanels ...<-chan T) <-chan []T {
 	return res
 }
 
-//Timer will send some value with some delay to chan until chanel not closed
+// Timer will send some value with some delay to chan until chanel not closed
 func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 	res := make(chan T, 0)
 	stop := make(chan byte)
@@ -130,7 +144,7 @@ func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 	}
 }
 
-//AccumulateChan accumulated results of other binary functions which is mentioned in func-parameter
+// AccumulateChan accumulated results of other binary functions which is mentioned in func-parameter
 func AccumulateChan[T constraints.Ordered](data <-chan T, fun func(total, elem T) T, initial T) <-chan T {
 	res := make(chan T)
 	acc := initial
@@ -144,13 +158,13 @@ func AccumulateChan[T constraints.Ordered](data <-chan T, fun func(total, elem T
 	return res
 }
 
-//Enumerated is wrapper struct for EnumerateChan func
+// Enumerated is wrapper struct for EnumerateChan func
 type Enumerated[T any] struct {
 	index int
 	value T
 }
 
-//EnumerateChan wrapper for provided chanel that will add index number to each chanel value
+// EnumerateChan wrapper for provided chanel that will add index number to each chanel value
 func EnumerateChan[T any](ch <-chan T) <-chan Enumerated[T] {
 	counter := 0
 	res := make(chan Enumerated[T], 0)
@@ -164,14 +178,14 @@ func EnumerateChan[T any](ch <-chan T) <-chan Enumerated[T] {
 	return res
 }
 
-//FanIn aggregate several chanels to one. Fan-in pattern implementation
-func FanIn[T any](chanels ...<-chan T) <-chan T {
+// FanIn aggregate several chanels to one. Fan-in pattern implementation
+func FanIn[T any](channels ...<-chan T) <-chan T {
 	res := make(chan T, 0)
 	go func() {
 		defer close(res)
 		wg := sync.WaitGroup{}
-		wg.Add(len(chanels))
-		for _, ch := range chanels {
+		wg.Add(len(channels))
+		for _, ch := range channels {
 			go func(c <-chan T, w *sync.WaitGroup) {
 				for v := range c {
 					res <- v
@@ -183,4 +197,16 @@ func FanIn[T any](chanels ...<-chan T) <-chan T {
 	}()
 
 	return res
+}
+
+// FanOut broadcasts message source chanel to targets
+func FanOut[T any](source <-chan T, channels ...chan T) {
+	go func() {
+		for sm := range source {
+			fmt.Printf("Sending \n")
+			for _, c := range channels {
+				go func(ch chan T, m T) { ch <- m }(c, sm)
+			}
+		}
+	}()
 }

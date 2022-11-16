@@ -1,6 +1,7 @@
 package dp
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -118,5 +119,53 @@ func TestFanIn(t *testing.T) {
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9}, Sort(ReleaseChanel(FanIn(ch1, ch2, ch3)), func(a, b int) bool {
 		return a < b
 	}, false))
+
+}
+
+func TestFunOut(t *testing.T) {
+	ch := make(chan int)
+	t1 := make(chan int)
+	t2 := make(chan int)
+	r1, r2 := make([]int, 0), make([]int, 0)
+	FanOut(ch, t1, t2)
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		for _, i := range []int{1, 2, 3} {
+			ch <- i
+		}
+		close(ch)
+	}()
+
+	go func() {
+		defer wg.Done()
+		for m := range t1 {
+			r1 = append(r1, m)
+			if len(r1) == 3 {
+				close(t1)
+			}
+		}
+
+	}()
+
+	go func() {
+		defer wg.Done()
+		for m := range t2 {
+			r2 = append(r2, m)
+			if len(r2) == 3 {
+				close(t2)
+			}
+		}
+	}()
+	wg.Wait()
+	r1 = Sort(r1, func(i, j int) bool {
+		return j > i
+	}, false)
+	r2 = Sort(r2, func(i, j int) bool {
+		return j > i
+	}, false)
+	assert.Equal(t, []int{1, 2, 3}, r1)
+	assert.Equal(t, r1, r2)
 
 }
