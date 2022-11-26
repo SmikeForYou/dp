@@ -6,6 +6,14 @@ func NewCache[K comparable, V any]() Cache[K, V] {
 	return make(map[K]V)
 }
 
+func NewCacheFromArr[K comparable, V any](data []V, visitor func(elem V) (K, V)) Cache[K, V] {
+	cache := NewCache[K, V]()
+	for _, v := range data {
+		cache.Push(visitor(v))
+	}
+	return cache
+}
+
 func (c Cache[K, V]) Push(key K, val V) {
 	c[key] = val
 }
