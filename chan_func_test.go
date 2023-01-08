@@ -100,7 +100,6 @@ func TestTimer(t *testing.T) {
 		cls()
 	}
 	assert.Greater(t, uint64(delta), uint64(timeout))
-	t.Logf("Delta: %d  Timout: %d", delta, timeout)
 }
 
 func TestEnumerateChan(t *testing.T) {

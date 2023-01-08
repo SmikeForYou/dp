@@ -1,7 +1,6 @@
 package dp
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -203,7 +202,6 @@ func FanIn[T any](channels ...<-chan T) <-chan T {
 func FanOut[T any](source <-chan T, channels ...chan T) {
 	go func() {
 		for sm := range source {
-			fmt.Printf("Sending \n")
 			for _, c := range channels {
 				go func(ch chan T, m T) { ch <- m }(c, sm)
 			}
