@@ -6,7 +6,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-//Sort sorts array
+// Sort bubblesort implementation
 func Sort[T any](data []T, compare func(T, T) bool, reverse bool) []T {
 	res := make([]T, len(data))
 	copy(res, data)
@@ -25,7 +25,7 @@ func Sort[T any](data []T, compare func(T, T) bool, reverse bool) []T {
 	return res
 }
 
-//Filter filters values of array ussing callback func
+// Filter filters values of array ussing callback func
 func Filter[T any](data []T, callback func(elem T, index int) bool) []T {
 	res := make([]T, 0)
 	for index, elem := range data {
@@ -36,7 +36,7 @@ func Filter[T any](data []T, callback func(elem T, index int) bool) []T {
 	return res
 }
 
-//Map applies callback function to each element of array and returns new array
+// Map applies callback function to each element of array and returns new array
 func Map[T, K any](data []T, callback func(elem T, index int) K) []K {
 	res := make([]K, 0)
 	for index, elem := range data {
@@ -45,7 +45,7 @@ func Map[T, K any](data []T, callback func(elem T, index int) K) []K {
 	return res
 }
 
-//Min will return minimum value of array
+// Min will return minimum value of array
 func Min[T constraints.Ordered](elems ...T) T {
 	var min T
 	for i, elem := range elems {
@@ -60,7 +60,7 @@ func Min[T constraints.Ordered](elems ...T) T {
 	return min
 }
 
-//Max will return maximum value of array
+// Max will return maximum value of array
 func Max[T constraints.Ordered](elems ...T) T {
 	var max T
 	for i, elem := range elems {
@@ -75,7 +75,7 @@ func Max[T constraints.Ordered](elems ...T) T {
 	return max
 }
 
-//Zip aggregates values from several arrays
+// Zip aggregates values from several arrays
 func Zip[T any](iterables ...[]T) [][]T {
 	minLength := Min(Map(iterables, func(elem []T, index int) int {
 		return len(elem)
@@ -89,13 +89,13 @@ func Zip[T any](iterables ...[]T) [][]T {
 	return res
 }
 
-//Grouper is goruping stuct for GroupBy
+// Grouper is goruping stuct for GroupBy
 type Grouper[T any] struct {
 	Key   any
 	Group []T
 }
 
-//GroupBy returns consecutive keys and groups from the iterable
+// GroupBy returns consecutive keys and groups from the iterable
 func GroupBy[T any](iterable []T, keyExtractor func(elem T) any) []Grouper[T] {
 	res := make([]Grouper[T], 0)
 	for _, elem := range iterable {
@@ -115,7 +115,7 @@ func GroupBy[T any](iterable []T, keyExtractor func(elem T) any) []Grouper[T] {
 	return res
 }
 
-//Repeat copy values to array several times
+// Repeat copy values to array several times
 func Repeat[T any](value T, count int) []T {
 	res := make([]T, count)
 	for i := 0; i < count; i++ {
@@ -124,7 +124,7 @@ func Repeat[T any](value T, count int) []T {
 	return res
 }
 
-//Chunk splits array to chunks
+// Chunk splits array to chunks
 func Chunk[T any](chunkSize int, iterable ...T) [][]T {
 	res := make([][]T, 0)
 	buf := make([]T, 0)
@@ -138,7 +138,7 @@ func Chunk[T any](chunkSize int, iterable ...T) [][]T {
 	return res
 }
 
-//Sum summs all value of array
+// Sum summs all value of array
 func Sum[T constraints.Ordered](data ...T) T {
 	var res T
 	for _, i := range data {
@@ -147,7 +147,7 @@ func Sum[T constraints.Ordered](data ...T) T {
 	return res
 }
 
-//SetTimeout will execute fn after some timeout
+// SetTimeout will execute fn after some timeout
 func SetTimeout(timeout time.Duration, fn func()) {
 	go func() {
 		time.Sleep(timeout)
@@ -155,7 +155,7 @@ func SetTimeout(timeout time.Duration, fn func()) {
 	}()
 }
 
-//Compress get 2 arrays and add values from 1st array to result if value in 2nd array with same index is true
+// Compress get 2 arrays and add values from 1st array to result if value in 2nd array with same index is true
 // If array length not equal shorter will be taken
 func Compress[T any](data []T, compressor []bool) []T {
 	min := Min(len(data), len(compressor))
@@ -169,8 +169,8 @@ func Compress[T any](data []T, compressor []bool) []T {
 
 }
 
-//In will return index of first appearance of elem in data.
-//Returns -1 if elem does not appear
+// In will return index of first appearance of elem in data.
+// Returns -1 if elem does not appear
 func In[T comparable](elem T, data []T) int {
 	for i, t := range data {
 		if t == elem {
@@ -178,4 +178,30 @@ func In[T comparable](elem T, data []T) int {
 		}
 	}
 	return -1
+}
+
+// Iterator implements iterator pattern without using unsafe code
+type Iterator[T any] struct {
+	data  []T
+	index int
+}
+
+func NewIterator[T any](data []T) Iterator[T] {
+	return Iterator[T]{data: data, index: -1}
+}
+
+// Next method runs Iterator
+func (receiver *Iterator[T]) Next() bool {
+	receiver.index++
+	return (receiver.index) < len(receiver.data)
+}
+
+// Elem returns current element of iteration
+func (receiver *Iterator[T]) Elem() T {
+	return receiver.data[receiver.index]
+}
+
+// Items returns current index of iteration and index
+func (receiver *Iterator[T]) Items() (int, T) {
+	return receiver.index, receiver.data[receiver.index]
 }

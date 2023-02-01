@@ -153,3 +153,13 @@ func TestIn(t *testing.T) {
 	assert.Equal(t, 0, In(1, data))
 	assert.Equal(t, -1, In(10, data))
 }
+
+func TestIterator(t *testing.T) {
+	data := []int{1, 2, 3, 4, 5, 6}
+	res := make([]int, 0)
+	iterator := NewIterator(data)
+	for iterator.Next() {
+		res = append(res, iterator.Elem())
+	}
+	assert.Equal(t, data, res)
+}
