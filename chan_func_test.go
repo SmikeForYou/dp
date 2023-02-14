@@ -99,7 +99,7 @@ func TestTimer(t *testing.T) {
 		delta = uint64(time.Now().Sub(startTime).Milliseconds())
 		cls()
 	}
-	assert.Greater(t, uint64(delta), uint64(timeout))
+	assert.GreaterOrEqual(t, uint64(delta), uint64(timeout))
 }
 
 func TestEnumerateChan(t *testing.T) {

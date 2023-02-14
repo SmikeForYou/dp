@@ -120,7 +120,7 @@ func ZipChan[T any](chanels ...<-chan T) <-chan []T {
 // Timer will send some value with some delay to chan until chanel not closed
 func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 	res := make(chan T, 0)
-	stop := make(chan byte)
+	stop := make(chan struct{})
 	go func() {
 		defer close(res)
 		dataCh, closeCycle := Cycle(val)
@@ -139,7 +139,7 @@ func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 
 	}()
 	return res, func() {
-		stop <- 1
+		stop <- struct{}{}
 	}
 }
 
