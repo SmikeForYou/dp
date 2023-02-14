@@ -163,3 +163,25 @@ func TestIterator(t *testing.T) {
 	}
 	assert.Equal(t, data, res)
 }
+
+func TestPermutations(t *testing.T) {
+	data := []int{1, 2, 3}
+	res := Permutations(data)
+	assert.Len(t, res, 6)
+	assert.Equal(t, []int{1, 2, 3}, res[0])
+	assert.Equal(t, []int{1, 3, 2}, res[1])
+	assert.Equal(t, []int{2, 1, 3}, res[2])
+	assert.Equal(t, []int{2, 3, 1}, res[3])
+	assert.Equal(t, []int{3, 1, 2}, res[4])
+	assert.Equal(t, []int{3, 2, 1}, res[5])
+	datastr := []string{"a", "b", "c"}
+	resstr := Permutations(datastr)
+	assert.Len(t, resstr, 6)
+	assert.Equal(t, []string{"a", "b", "c"}, resstr[0])
+	assert.Equal(t, []string{"a", "c", "b"}, resstr[1])
+	assert.Equal(t, []string{"b", "a", "c"}, resstr[2])
+	assert.Equal(t, []string{"b", "c", "a"}, resstr[3])
+	assert.Equal(t, []string{"c", "a", "b"}, resstr[4])
+	assert.Equal(t, []string{"c", "b", "a"}, resstr[5])
+
+}

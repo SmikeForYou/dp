@@ -205,3 +205,21 @@ func (receiver *Iterator[T]) Elem() T {
 func (receiver *Iterator[T]) Items() (int, T) {
 	return receiver.index, receiver.data[receiver.index]
 }
+
+// Permutations returns all permutations of array
+func Permutations[T comparable](data []T) [][]T {
+	if len(data) == 2 {
+		return [][]T{data, {data[1], data[0]}}
+	} else {
+		res := make([][]T, 0)
+		for i, elem := range data {
+			rest := make([]T, 0)
+			rest = append(rest, data[:i]...)
+			rest = append(rest, data[i+1:]...)
+			for _, perm := range Permutations(rest) {
+				res = append(res, append([]T{elem}, perm...))
+			}
+		}
+		return res
+	}
+}
