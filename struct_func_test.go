@@ -60,3 +60,22 @@ func TestGetFieldByTag(t *testing.T) {
 	_, _, err = GetFieldByTag(v, "tag", "c")
 	assert.NotNil(t, err)
 }
+
+func TestRefArray(t *testing.T) {
+	arr := []int{1, 2, 3}
+	res := RefArray(arr)
+	assert.Equal(t, 1, *res[0])
+	assert.Equal(t, 2, *res[1])
+	assert.Equal(t, 3, *res[2])
+}
+
+func TestDerefArray(t *testing.T) {
+	arr := []*int{new(int), new(int), new(int)}
+	*arr[0] = 1
+	*arr[1] = 2
+	*arr[2] = 3
+	res := DerefArray(arr)
+	assert.Equal(t, 1, res[0])
+	assert.Equal(t, 2, res[1])
+	assert.Equal(t, 3, res[2])
+}

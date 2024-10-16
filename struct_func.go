@@ -84,3 +84,22 @@ func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, re
 	}
 	return reflect.StructField{}, reflect.Value{}, fmt.Errorf("GetFieldByTag: tag not found")
 }
+
+// DerefArray converts array of pointers to array of values
+func DerefArray[T any](arr []*T) []T {
+	res := make([]T, 0)
+	for _, i := range arr {
+		res = append(res, *i)
+	}
+	return res
+}
+
+// RefArray converts array of values to array of pointers
+func RefArray[T any](arr []T) []*T {
+	res := make([]*T, 0)
+	for _, i := range arr {
+		var v = i
+		res = append(res, &v)
+	}
+	return res
+}
