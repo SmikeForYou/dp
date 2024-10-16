@@ -41,3 +41,22 @@ func TestStructToArr(t *testing.T) {
 	_, err := StructToArr([]int{}, "tag")
 	assert.NotNil(t, err)
 }
+
+func TestGetFieldByTag(t *testing.T) {
+	type TestStruct struct {
+		A int    `tag:"a"`
+		B string `tag:"b"`
+	}
+	v := TestStruct{1, "1"}
+	_, val, _ := GetFieldByTag(v, "tag", "a")
+	assert.Equal(t, 1, int(val.Int()))
+
+	_, val, _ = GetFieldByTag(&v, "tag", "b")
+	assert.Equal(t, "1", val.String())
+
+	_, _, err := GetFieldByTag([]int{}, "tag", "a")
+	assert.NotNil(t, err)
+
+	_, _, err = GetFieldByTag(v, "tag", "c")
+	assert.NotNil(t, err)
+}

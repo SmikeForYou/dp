@@ -58,3 +58,29 @@ func StructToArr(in any, tag string) ([]any, error) {
 	}
 	return out, nil
 }
+
+// GetFieldByTag returns the struct field and value of the field with the given tag.
+// If tagValue is empty, the first field with the given tag is returned.
+func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, reflect.Value, error) {
+	v := reflect.ValueOf(in)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return reflect.StructField{}, reflect.Value{}, fmt.Errorf("GetFieldByTag only accepts structs; got %T", v)
+	}
+	typ := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		fi := typ.Field(i)
+		if tagv := fi.Tag.Get(tag); tagv != "" {
+			if tagValue != "" {
+				if tagv == tagValue {
+					return fi, v.Field(i), nil
+				}
+			} else {
+				return fi, v.Field(i), nil
+			}
+		}
+	}
+	return reflect.StructField{}, reflect.Value{}, fmt.Errorf("GetFieldByTag: tag not found")
+}
