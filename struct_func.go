@@ -76,7 +76,7 @@ func StructToArr(in any, tag string) ([]any, error) {
 // Returns:
 // - The struct field and its value.
 // - An error if the input is not a struct or the tag is not found.
-func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, reflect.Value, error) {
+func GetFieldByTag(in any, tag string, tagValue ...string) (reflect.StructField, reflect.Value, error) {
 	v := reflect.ValueOf(in)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
@@ -88,8 +88,8 @@ func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, re
 	for i := 0; i < v.NumField(); i++ {
 		fi := typ.Field(i)
 		if tagv := fi.Tag.Get(tag); tagv != "" {
-			if tagValue != "" {
-				if tagv == tagValue {
+			if tagValue != nil {
+				if In(tagv, tagValue) != -1 {
 					return fi, v.Field(i), nil
 				}
 			} else {
