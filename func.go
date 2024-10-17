@@ -128,11 +128,11 @@ type Grouper[T any] struct {
 // - keyExtractor: A function to extract the key for each element.
 // Returns:
 // - A slice of Grouper structs.
-func GroupBy[T any](iterable []T, keyExtractor func(elem T) any) []Grouper[T] {
+func GroupBy[T any](iterable []T, keyExtractor func(elem *T) any) []Grouper[T] {
 	res := make([]Grouper[T], 0)
 	for _, elem := range iterable {
 		keyExists := false
-		keyExtracted := keyExtractor(elem)
+		keyExtracted := keyExtractor(&elem)
 		for i, gr := range res {
 			if gr.Key == keyExtracted {
 				keyExists = true
