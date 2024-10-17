@@ -5,10 +5,14 @@ import (
 	"reflect"
 )
 
-// ToMap converts a struct to a map using the struct's tags.
-//
-// ToMap uses tags on struct fields to decide which fields to add to the
-// returned map.
+// StructToMap converts a struct to a map using the struct's tags.
+// It uses tags on struct fields to decide which fields to add to the returned map.
+// Parameters:
+// - in: The input struct to be converted.
+// - tag: The tag used to filter the struct fields.
+// Returns:
+// - A map with keys as tag values and values as struct field values.
+// - An error if the input is not a struct.
 func StructToMap(in any, tag string) (map[string]any, error) {
 	out := make(map[string]any)
 
@@ -34,10 +38,14 @@ func StructToMap(in any, tag string) (map[string]any, error) {
 	return out, nil
 }
 
-// ToArr converts a struct to a slice of values of struct field.
-//
-// ToArr uses tags on struct fields to decide which fields to add to the
-// returned slice.
+// StructToArr converts a struct to a slice of values of struct field.
+// It uses tags on struct fields to decide which fields to add to the returned slice.
+// Parameters:
+// - in: The input struct to be converted.
+// - tag: The tag used to filter the struct fields.
+// Returns:
+// - A slice of struct field values.
+// - An error if the input is not a struct.
 func StructToArr(in any, tag string) ([]any, error) {
 	out := make([]any, 0)
 	v := reflect.ValueOf(in)
@@ -61,6 +69,13 @@ func StructToArr(in any, tag string) ([]any, error) {
 
 // GetFieldByTag returns the struct field and value of the field with the given tag.
 // If tagValue is empty, the first field with the given tag is returned.
+// Parameters:
+// - in: The input struct to be searched.
+// - tag: The tag used to filter the struct fields.
+// - tagValue: The specific tag value to search for.
+// Returns:
+// - The struct field and its value.
+// - An error if the input is not a struct or the tag is not found.
 func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, reflect.Value, error) {
 	v := reflect.ValueOf(in)
 	if v.Kind() == reflect.Ptr {
@@ -85,7 +100,11 @@ func GetFieldByTag(in any, tag string, tagValue string) (reflect.StructField, re
 	return reflect.StructField{}, reflect.Value{}, fmt.Errorf("GetFieldByTag: tag not found")
 }
 
-// DerefArray converts array of pointers to array of values
+// DerefArray converts an array of pointers to an array of values.
+// Parameters:
+// - arr: The input array of pointers.
+// Returns:
+// - An array of values.
 func DerefArray[T any](arr []*T) []T {
 	res := make([]T, 0)
 	for _, i := range arr {
@@ -94,7 +113,11 @@ func DerefArray[T any](arr []*T) []T {
 	return res
 }
 
-// RefArray converts array of values to array of pointers
+// RefArray converts an array of values to an array of pointers.
+// Parameters:
+// - arr: The input array of values.
+// Returns:
+// - An array of pointers.
 func RefArray[T any](arr []T) []*T {
 	res := make([]*T, 0)
 	for _, i := range arr {

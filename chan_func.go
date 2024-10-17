@@ -7,7 +7,11 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Chanalize converts array of values to channel with this values
+// Chanalize converts an array of values to a channel with these values.
+// Parameters:
+// - values: The values to send to the channel.
+// Returns:
+// - A channel that will receive the values.
 func Chanalize[T any](values ...T) <-chan T {
 	ch := make(chan T)
 	go func() {
@@ -19,7 +23,12 @@ func Chanalize[T any](values ...T) <-chan T {
 	return ch
 }
 
-// ChanalizeCb converts array of values to channel with this values and runs callback func afterall
+// ChanalizeCb converts an array of values to a channel with these values and runs a callback function after all values are sent.
+// Parameters:
+// - callback: The function to call after all values are sent.
+// - values: The values to send to the channel.
+// Returns:
+// - A channel that will receive the values.
 func ChanalizeCb[T any](callback func(), values ...T) <-chan T {
 	ch := make(chan T)
 	go func() {
@@ -32,7 +41,11 @@ func ChanalizeCb[T any](callback func(), values ...T) <-chan T {
 	return ch
 }
 
-// ReleaseChanel read all values from chanel and returns array of this values
+// ReleaseChanel reads all values from a channel and returns an array of these values.
+// Parameters:
+// - chanel: The channel to read values from.
+// Returns:
+// - An array of values read from the channel.
 func ReleaseChanel[T any](chanel <-chan T) []T {
 	res := make([]T, 0)
 	for i := range chanel {
@@ -41,7 +54,12 @@ func ReleaseChanel[T any](chanel <-chan T) []T {
 	return res
 }
 
-// Cycle will cyclical returns values from iterable to channel one by one until chanel not closed
+// Cycle will cyclically return values from an iterable to a channel one by one until the channel is closed.
+// Parameters:
+// - iterable: The values to cycle through.
+// Returns:
+// - A channel that will receive the values cyclically.
+// - A function to stop the cycling.
 func Cycle[T any](iterable ...T) (<-chan T, func()) {
 	res := make(chan T)
 	stop := make(chan byte, 5)
@@ -65,7 +83,12 @@ func Cycle[T any](iterable ...T) (<-chan T, func()) {
 	return res, closefunc
 }
 
-// FilterChan filters channel values using callback function
+// FilterChan filters channel values using a callback function.
+// Parameters:
+// - data: The input channel to filter.
+// - callback: The function to use for filtering values.
+// Returns:
+// - A channel that will receive the filtered values.
 func FilterChan[T any](data <-chan T, callback func(elem T) bool) <-chan T {
 	res := make(chan T)
 	go func() {
@@ -79,7 +102,12 @@ func FilterChan[T any](data <-chan T, callback func(elem T) bool) <-chan T {
 	return res
 }
 
-// MapChan applies callback function to each value of chan and return to to new chanel
+// MapChan applies a callback function to each value of a channel and returns a new channel with the results.
+// Parameters:
+// - data: The input channel to map.
+// - callback: The function to apply to each value.
+// Returns:
+// - A channel that will receive the mapped values.
 func MapChan[T, K any](data <-chan T, callback func(elem T) K) <-chan K {
 	res := make(chan K)
 	go func() {
@@ -91,7 +119,11 @@ func MapChan[T, K any](data <-chan T, callback func(elem T) K) <-chan K {
 	return res
 }
 
-// ZipChan aggregates values from several chanels to portions and send them to result chanel
+// ZipChan aggregates values from several channels into portions and sends them to a result channel.
+// Parameters:
+// - chanels: The input channels to aggregate.
+// Returns:
+// - A channel that will receive the aggregated values.
 func ZipChan[T any](chanels ...<-chan T) <-chan []T {
 	res := make(chan []T)
 	go func() {
@@ -112,12 +144,17 @@ func ZipChan[T any](chanels ...<-chan T) <-chan []T {
 			}
 			res <- item
 		}
-
 	}()
 	return res
 }
 
-// Timer will send some value with some delay to chan until chanel not closed
+// Timer will send a value with a delay to a channel until the channel is closed.
+// Parameters:
+// - lap: The duration to wait between sending values.
+// - val: The value to send.
+// Returns:
+// - A channel that will receive the values.
+// - A function to stop the timer.
 func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 	res := make(chan T, 0)
 	stop := make(chan struct{})
@@ -136,14 +173,19 @@ func Timer[T any](lap time.Duration, val T) (<-chan T, func()) {
 				return
 			}
 		}
-
 	}()
 	return res, func() {
 		stop <- struct{}{}
 	}
 }
 
-// AccumulateChan accumulated results of other binary functions which is mentioned in func-parameter
+// AccumulateChan accumulates results of other binary functions which are mentioned in the function parameter.
+// Parameters:
+// - data: The input channel to accumulate.
+// - fun: The function to use for accumulation.
+// - initial: The initial value for accumulation.
+// Returns:
+// - A channel that will receive the accumulated values.
 func AccumulateChan[T constraints.Ordered](data <-chan T, fun func(total, elem T) T, initial T) <-chan T {
 	res := make(chan T)
 	acc := initial
@@ -157,13 +199,17 @@ func AccumulateChan[T constraints.Ordered](data <-chan T, fun func(total, elem T
 	return res
 }
 
-// Enumerated is wrapper struct for EnumerateChan func
+// Enumerated is a wrapper struct for the EnumerateChan function.
 type Enumerated[T any] struct {
 	index int
 	value T
 }
 
-// EnumerateChan wrapper for provided chanel that will add index number to each chanel value
+// EnumerateChan wraps a provided channel and adds an index number to each channel value.
+// Parameters:
+// - ch: The input channel to enumerate.
+// Returns:
+// - A channel that will receive the enumerated values.
 func EnumerateChan[T any](ch <-chan T) <-chan Enumerated[T] {
 	counter := 0
 	res := make(chan Enumerated[T], 0)
@@ -177,7 +223,11 @@ func EnumerateChan[T any](ch <-chan T) <-chan Enumerated[T] {
 	return res
 }
 
-// FanIn aggregate several chanels to one. Fan-in pattern implementation
+// FanIn aggregates several channels into one. Fan-in pattern implementation.
+// Parameters:
+// - channels: The input channels to aggregate.
+// Returns:
+// - A channel that will receive the aggregated values.
 func FanIn[T any](channels ...<-chan T) <-chan T {
 	res := make(chan T, 0)
 	go func() {
@@ -194,11 +244,13 @@ func FanIn[T any](channels ...<-chan T) <-chan T {
 		}
 		wg.Wait()
 	}()
-
 	return res
 }
 
-// FanOut broadcasts message source chanel to targets
+// FanOut broadcasts messages from a source channel to target channels.
+// Parameters:
+// - source: The source channel to broadcast from.
+// - channels: The target channels to broadcast to.
 func FanOut[T any](source <-chan T, channels ...chan T) {
 	go func() {
 		for sm := range source {
