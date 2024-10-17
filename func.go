@@ -1,12 +1,17 @@
 package dp
 
 import (
-	"time"
-
 	"golang.org/x/exp/constraints"
+	"time"
 )
 
-// Sort bubblesort implementation
+// Sort performs a bubble sort on the provided data.
+// Parameters:
+// - data: The slice of elements to sort.
+// - compare: A function to compare two elements.
+// - reverse: A boolean indicating whether to sort in reverse order.
+// Returns:
+// - A sorted slice of elements.
 func Sort[T any](data []T, compare func(T, T) bool, reverse bool) []T {
 	res := make([]T, len(data))
 	copy(res, data)
@@ -25,7 +30,12 @@ func Sort[T any](data []T, compare func(T, T) bool, reverse bool) []T {
 	return res
 }
 
-// Filter filters values of array ussing callback func
+// Filter filters values of a slice using a callback function.
+// Parameters:
+// - data: The slice of elements to filter.
+// - callback: A function to determine if an element should be included.
+// Returns:
+// - A slice of filtered elements.
 func Filter[T any](data []T, callback func(elem T, index int) bool) []T {
 	res := make([]T, 0)
 	for index, elem := range data {
@@ -36,7 +46,12 @@ func Filter[T any](data []T, callback func(elem T, index int) bool) []T {
 	return res
 }
 
-// Map applies callback function to each element of array and returns new array
+// Map applies a callback function to each element of a slice and returns a new slice.
+// Parameters:
+// - data: The slice of elements to map.
+// - callback: A function to apply to each element.
+// Returns:
+// - A slice of mapped elements.
 func Map[T, K any](data []T, callback func(elem T, index int) K) []K {
 	res := make([]K, 0)
 	for index, elem := range data {
@@ -45,7 +60,11 @@ func Map[T, K any](data []T, callback func(elem T, index int) K) []K {
 	return res
 }
 
-// Min will return minimum value of array
+// Min returns the minimum value of a slice.
+// Parameters:
+// - elems: The elements to find the minimum value of.
+// Returns:
+// - The minimum value.
 func Min[T constraints.Ordered](elems ...T) T {
 	var min T
 	for i, elem := range elems {
@@ -60,7 +79,11 @@ func Min[T constraints.Ordered](elems ...T) T {
 	return min
 }
 
-// Max will return maximum value of array
+// Max returns the maximum value of a slice.
+// Parameters:
+// - elems: The elements to find the maximum value of.
+// Returns:
+// - The maximum value.
 func Max[T constraints.Ordered](elems ...T) T {
 	var max T
 	for i, elem := range elems {
@@ -75,7 +98,11 @@ func Max[T constraints.Ordered](elems ...T) T {
 	return max
 }
 
-// Zip aggregates values from several arrays
+// Zip aggregates values from several slices.
+// Parameters:
+// - iterables: The slices to aggregate.
+// Returns:
+// - A slice of aggregated values.
 func Zip[T any](iterables ...[]T) [][]T {
 	minLength := Min(Map(iterables, func(elem []T, index int) int {
 		return len(elem)
@@ -89,13 +116,18 @@ func Zip[T any](iterables ...[]T) [][]T {
 	return res
 }
 
-// Grouper is goruping stuct for GroupBy
+// Grouper is a grouping struct for GroupBy.
 type Grouper[T any] struct {
 	Key   any
 	Group []T
 }
 
-// GroupBy returns consecutive keys and groups from the iterable
+// GroupBy returns consecutive keys and groups from the iterable.
+// Parameters:
+// - iterable: The slice of elements to group.
+// - keyExtractor: A function to extract the key for each element.
+// Returns:
+// - A slice of Grouper structs.
 func GroupBy[T any](iterable []T, keyExtractor func(elem T) any) []Grouper[T] {
 	res := make([]Grouper[T], 0)
 	for _, elem := range iterable {
@@ -115,7 +147,12 @@ func GroupBy[T any](iterable []T, keyExtractor func(elem T) any) []Grouper[T] {
 	return res
 }
 
-// Repeat copy values to array several times
+// Repeat copies a value to a slice several times.
+// Parameters:
+// - value: The value to repeat.
+// - count: The number of times to repeat the value.
+// Returns:
+// - A slice of repeated values.
 func Repeat[T any](value T, count int) []T {
 	res := make([]T, count)
 	for i := 0; i < count; i++ {
@@ -124,7 +161,12 @@ func Repeat[T any](value T, count int) []T {
 	return res
 }
 
-// Chunk splits array to chunks
+// Chunk splits a slice into chunks.
+// Parameters:
+// - chunkSize: The size of each chunk.
+// - iterable: The slice to split into chunks.
+// Returns:
+// - A slice of chunks.
 func Chunk[T any](chunkSize int, iterable ...T) [][]T {
 	res := make([][]T, 0)
 	buf := make([]T, 0)
@@ -138,7 +180,11 @@ func Chunk[T any](chunkSize int, iterable ...T) [][]T {
 	return res
 }
 
-// Sum summs all value of array
+// Sum sums all values of a slice.
+// Parameters:
+// - data: The slice of elements to sum.
+// Returns:
+// - The sum of the elements.
 func Sum[T constraints.Ordered](data ...T) T {
 	var res T
 	for _, i := range data {
@@ -147,7 +193,10 @@ func Sum[T constraints.Ordered](data ...T) T {
 	return res
 }
 
-// SetTimeout will execute fn after some timeout
+// SetTimeout executes a function after a timeout.
+// Parameters:
+// - timeout: The duration to wait before executing the function.
+// - fn: The function to execute.
 func SetTimeout(timeout time.Duration, fn func()) {
 	go func() {
 		time.Sleep(timeout)
@@ -155,8 +204,13 @@ func SetTimeout(timeout time.Duration, fn func()) {
 	}()
 }
 
-// Compress get 2 arrays and add values from 1st array to result if value in 2nd array with same index is true
-// If array length not equal shorter will be taken
+// Compress gets two slices and adds values from the first slice to the result if the value in the second slice with the same index is true.
+// If the slice lengths are not equal, the shorter one will be taken.
+// Parameters:
+// - data: The slice of elements to compress.
+// - compressor: The slice of booleans to determine which elements to include.
+// Returns:
+// - A slice of compressed elements.
 func Compress[T any](data []T, compressor []bool) []T {
 	min := Min(len(data), len(compressor))
 	res := make([]T, 0)
@@ -166,11 +220,15 @@ func Compress[T any](data []T, compressor []bool) []T {
 		}
 	}
 	return res
-
 }
 
-// In will return index of first appearance of elem in data.
-// Returns -1 if elem does not appear
+// In returns the index of the first appearance of an element in a slice.
+// Returns -1 if the element does not appear.
+// Parameters:
+// - elem: The element to search for.
+// - data: The slice to search in.
+// Returns:
+// - The index of the element, or -1 if not found.
 func In[T comparable](elem T, data []T) int {
 	for i, t := range data {
 		if t == elem {
@@ -180,33 +238,46 @@ func In[T comparable](elem T, data []T) int {
 	return -1
 }
 
-// Iterator implements iterator pattern without using unsafe code
+// Iterator implements the iterator pattern without using unsafe code.
 type Iterator[T any] struct {
 	data  []T
 	index int
 }
 
+// NewIterator creates a new Iterator.
+// Parameters:
+// - data: The slice of elements to iterate over.
+// Returns:
+// - A new Iterator.
 func NewIterator[T any](data []T) Iterator[T] {
 	return Iterator[T]{data: data, index: -1}
 }
 
-// Next method runs Iterator
+// Next advances the Iterator to the next element.
+// Returns true if there are more elements to iterate over.
+// Returns false if the end of the slice is reached.
 func (receiver *Iterator[T]) Next() bool {
 	receiver.index++
 	return (receiver.index) < len(receiver.data)
 }
 
-// Elem returns current element of iteration
+// Elem returns the current element of the iteration.
+// Returns the current element.
 func (receiver *Iterator[T]) Elem() T {
 	return receiver.data[receiver.index]
 }
 
-// Items returns current index of iteration and index
+// Items returns the current index of the iteration and the element at that index.
+// Returns the current index and element.
 func (receiver *Iterator[T]) Items() (int, T) {
 	return receiver.index, receiver.data[receiver.index]
 }
 
-// Permutations returns all permutations of array
+// Permutations returns all permutations of a slice.
+// Parameters:
+// - data: The slice of elements to permute.
+// Returns:
+// - A slice of permutations.
 func Permutations[T comparable](data []T) [][]T {
 	if len(data) == 2 {
 		return [][]T{data, {data[1], data[0]}}
